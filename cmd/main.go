@@ -2,10 +2,15 @@ package main
 
 import (
 	"fmt"
+	"location-service/internal/db"
 	"net/http"
 )
 
 func main() {
+
+	pool := db.Connect()
+	defer pool.Close()
+
 	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("pong"))
 	})
