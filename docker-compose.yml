@@ -15,6 +15,8 @@ services:
 
   app:
     build: .
+    volumes:
+      - ./internal/db/migrations:/app/internal/db/migrations
     container_name: location-service
     restart: always
     depends_on:
