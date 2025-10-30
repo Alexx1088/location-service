@@ -1,0 +1,5 @@
+CREATE TABLE streets (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    city_id INTEGER NOT NULL REFERENCES cities(id) ON DELETE CASCADE
+    );
