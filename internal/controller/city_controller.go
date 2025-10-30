@@ -56,7 +56,6 @@ func (c *CityController) GetCity(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(city)
 }
 
-// ✅ PUT /cities/{id}
 func (c *CityController) UpdateCity(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
@@ -80,7 +79,6 @@ func (c *CityController) UpdateCity(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(city)
 }
 
-// ✅ DELETE /cities/{id}
 func (c *CityController) DeleteCity(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
