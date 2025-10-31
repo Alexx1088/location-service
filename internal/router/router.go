@@ -12,14 +12,14 @@ import (
 
 func NewRouter(pool *pgxpool.Pool) http.Handler {
 
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+
+	// ---- Cities ----
 	cityRepo := repository.NewCityRepository(pool)
 	cityService := service.NewCityService(cityRepo)
 	cityController := controller.NewCityController(cityService)
-
-	r := chi.NewRouter()
-
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
 
 	r.Route("/cities", func(r chi.Router) {
 		r.Get("/", cityController.ListCities)
@@ -27,6 +27,19 @@ func NewRouter(pool *pgxpool.Pool) http.Handler {
 		r.Get("/{id}", cityController.GetCity)
 		r.Put("/{id}", cityController.UpdateCity)
 		r.Delete("/{id}", cityController.DeleteCity)
+	})
+
+	// ---- Streets ----
+	streetRepo := repository.NewStreetRepository(pool)
+	streetService := service.NewStreetService(streetRepo)
+	streetController := controller.NewStreetController(streetService)
+
+	r.Route("/streets", func(r chi.Router) {
+		r.Get("/", streetController.ListStreets)
+		r.Post("/", streetController.CreateStreet)
+		r.Get("/{id}", streetController.GetStreet)
+		r.Put("/{id}", streetController.UpdateStreet)
+		r.Delete("/{id}", streetController.DeleteStreet)
 	})
 
 	return r

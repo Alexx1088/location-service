@@ -31,7 +31,7 @@ func (c *StreetController) CreateStreet(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(street)
 }
 
-func (c *StreetController) ListCities(w http.ResponseWriter, r *http.Request) {
+func (c *StreetController) ListStreets(w http.ResponseWriter, r *http.Request) {
 	streets, err := c.service.ListStreets(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
