@@ -42,5 +42,18 @@ func NewRouter(pool *pgxpool.Pool) http.Handler {
 		r.Delete("/{id}", streetController.DeleteStreet)
 	})
 
+	// ----- Crossroads
+	crossroadRepo := repository.NewCrossroadRepository(pool)
+	crossroadService := service.NewCrossroadService(crossroadRepo)
+	crossroadController := controller.NewCrossroadController(crossroadService)
+
+	r.Route("/crossroads", func(r chi.Router) {
+		r.Get("/", crossroadController.ListCrossroads)
+		r.Post("/", crossroadController.CreateCrossroad)
+		r.Put("/{id}", crossroadController.UpdateCrossroad)
+		r.Delete("/{id}", crossroadController.DeleteCrossroad)
+		r.Get("/{id}", crossroadController.GetCrossroad)
+	})
+
 	return r
 }

@@ -34,7 +34,7 @@ func (r *CrossroadRepository) Create(ctx context.Context, crossroad *model.Cross
 }
 
 func (r *CrossroadRepository) GetAll(ctx context.Context) ([]model.Crossroad, error) {
-	rows, err := r.db.Query(ctx, "SELECT id, street_id FROM streets")
+	rows, err := r.db.Query(ctx, "SELECT id, street_id FROM crossroads")
 	if err != nil {
 		return nil, err
 	}
