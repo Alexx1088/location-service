@@ -28,7 +28,10 @@ func (c *StreetController) CreateStreet(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(street)
+	err := json.NewEncoder(w).Encode(street)
+	if err != nil {
+		return
+	}
 }
 
 func (c *StreetController) ListStreets(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +40,10 @@ func (c *StreetController) ListStreets(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(streets)
+	err = json.NewEncoder(w).Encode(streets)
+	if err != nil {
+		return
+	}
 }
 
 func (c *StreetController) GetStreet(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +59,10 @@ func (c *StreetController) GetStreet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(street)
+	err = json.NewEncoder(w).Encode(street)
+	if err != nil {
+		return
+	}
 }
 
 func (c *StreetController) UpdateStreet(w http.ResponseWriter, r *http.Request) {
@@ -76,7 +85,10 @@ func (c *StreetController) UpdateStreet(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	json.NewEncoder(w).Encode(street)
+	err = json.NewEncoder(w).Encode(street)
+	if err != nil {
+		return
+	}
 }
 
 func (c *StreetController) DeleteStreet(w http.ResponseWriter, r *http.Request) {

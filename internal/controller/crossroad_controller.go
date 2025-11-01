@@ -28,7 +28,10 @@ func (c *CrossroadController) CreateCrossroad(w http.ResponseWriter, r *http.Req
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(crossroad)
+	err := json.NewEncoder(w).Encode(crossroad)
+	if err != nil {
+		return
+	}
 }
 
 func (c *CrossroadController) ListCrossroads(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +40,10 @@ func (c *CrossroadController) ListCrossroads(w http.ResponseWriter, r *http.Requ
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(crossroads)
+	err = json.NewEncoder(w).Encode(crossroads)
+	if err != nil {
+		return
+	}
 }
 
 func (c *CrossroadController) GetCrossroad(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +59,10 @@ func (c *CrossroadController) GetCrossroad(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	json.NewEncoder(w).Encode(crossroad)
+	err = json.NewEncoder(w).Encode(crossroad)
+	if err != nil {
+		return
+	}
 }
 
 func (c *CrossroadController) UpdateCrossroad(w http.ResponseWriter, r *http.Request) {
@@ -76,7 +85,10 @@ func (c *CrossroadController) UpdateCrossroad(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	json.NewEncoder(w).Encode(crossroad)
+	err = json.NewEncoder(w).Encode(crossroad)
+	if err != nil {
+		return
+	}
 }
 
 func (c *CrossroadController) DeleteCrossroad(w http.ResponseWriter, r *http.Request) {
