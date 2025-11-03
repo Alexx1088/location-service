@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"location-service/internal/model"
 	"location-service/internal/repository"
 )
@@ -15,6 +17,17 @@ func NewCrossroadService(repo *repository.CrossroadRepository) *CrossroadService
 }
 
 func (s *CrossroadService) CreateCrossroad(ctx context.Context, crossroad *model.Crossroad) error {
+
+	existing, err := s.repo.FindByStreetAndCity(ctx, crossroad.StreetId, crossroad.CityId)
+
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+
+	if existing != nil {
+		return fmt.Errorf("crossroad already exists for this street and city")
+	}
+
 	return s.repo.Create(ctx, crossroad)
 }
 

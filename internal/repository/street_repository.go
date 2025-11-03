@@ -2,11 +2,8 @@ package repository
 
 import (
 	"context"
-	"errors"
-	"github.com/jackc/pgx/v5/pgconn"
-	"location-service/internal/model"
-
 	"github.com/jackc/pgx/v5/pgxpool"
+	"location-service/internal/model"
 )
 
 type StreetRepository struct {
@@ -18,23 +15,16 @@ func NewStreetRepository(db *pgxpool.Pool) *StreetRepository {
 }
 
 func (r *StreetRepository) Create(ctx context.Context, street *model.Street) error {
-	query := `INSERT INTO streets (name, city_id) VALUES ($1, $2) RETURNING id`
-	err := r.db.QueryRow(ctx, query, street.Name, street.CityId).Scan(&street.Id)
+	query := `INSERT INTO streets (name) VALUES ($1) RETURNING id`
+	err := r.db.QueryRow(ctx, query, street.Name).Scan(&street.Id)
 	if err != nil {
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
-			if pgErr.Code == "23503" {
-				return errors.New("city does not exist")
-			}
-		}
 		return err
 	}
-
 	return nil
 }
 
 func (r *StreetRepository) GetAll(ctx context.Context) ([]model.Street, error) {
-	rows, err := r.db.Query(ctx, "SELECT id, name, city_id FROM streets")
+	rows, err := r.db.Query(ctx, "SELECT id, name FROM streets")
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +33,8 @@ func (r *StreetRepository) GetAll(ctx context.Context) ([]model.Street, error) {
 	var streets []model.Street
 	for rows.Next() {
 		var s model.Street
-		if err := rows.Scan(&s.Id, &s.Name, &s.CityId); err != nil {
+
+		if err := rows.Scan(&s.Id, &s.Name); err != nil {
 			return nil, err
 		}
 		streets = append(streets, s)
@@ -53,8 +44,8 @@ func (r *StreetRepository) GetAll(ctx context.Context) ([]model.Street, error) {
 
 func (r *StreetRepository) GetByID(ctx context.Context, id int) (*model.Street, error) {
 	var street model.Street
-	err := r.db.QueryRow(ctx, "SELECT id, name, city_id FROM streets WHERE id=$1", id).
-		Scan(&street.Id, &street.Name, &street.CityId)
+	err := r.db.QueryRow(ctx, "SELECT id, name FROM streets WHERE id=$1", id).
+		Scan(&street.Id, &street.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -67,15 +58,9 @@ func (r *StreetRepository) Delete(ctx context.Context, id int) error {
 }
 
 func (r *StreetRepository) Update(ctx context.Context, street *model.Street) error {
-	query := `UPDATE streets SET name = $1, city_id = $2 where id = $3`
-	_, err := r.db.Exec(ctx, query, street.Name, street.CityId, street.Id)
+	query := `UPDATE streets SET name = $1 where id = $2`
+	_, err := r.db.Exec(ctx, query, street.Name, street.Id)
 	if err != nil {
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
-			if pgErr.Code == "23503" {
-				return errors.New("city does not exist")
-			}
-		}
 		return err
 	}
 

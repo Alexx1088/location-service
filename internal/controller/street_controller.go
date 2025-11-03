@@ -3,6 +3,8 @@ package controller
 import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-playground/validator/v10"
+	"location-service/internal/dto/street"
 	"location-service/internal/model"
 	"location-service/internal/service"
 	"net/http"
@@ -10,25 +12,40 @@ import (
 )
 
 type StreetController struct {
-	service *service.StreetService
+	service  *service.StreetService
+	validate *validator.Validate
 }
 
 func NewStreetController(s *service.StreetService) *StreetController {
-	return &StreetController{service: s}
+	return &StreetController{
+		service:  s,
+		validate: validator.New(),
+	}
 }
 
 func (c *StreetController) CreateStreet(w http.ResponseWriter, r *http.Request) {
-	var street model.Street
-	if err := json.NewDecoder(r.Body).Decode(&street); err != nil {
+
+	var req street.CreateStreetRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if err := c.service.CreateStreet(r.Context(), &street); err != nil {
+	if err := c.validate.Struct(req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	streets := model.Street{
+		Name: req.Name,
+	}
+
+	if err := c.service.CreateStreet(r.Context(), &streets); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err := json.NewEncoder(w).Encode(street)
+	err := json.NewEncoder(w).Encode(streets)
 	if err != nil {
 		return
 	}
@@ -73,19 +90,29 @@ func (c *StreetController) UpdateStreet(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	var street model.Street
-	if err := json.NewDecoder(r.Body).Decode(&street); err != nil {
+	var req street.UpdateStreetRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	street.Id = int64(id)
-	if err := c.service.UpdateStreet(r.Context(), &street); err != nil {
+	if err := c.validate.Struct(req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	streets := model.Street{
+		Id:   int64(id),
+		Name: req.Name,
+	}
+
+	if err := c.service.UpdateStreet(r.Context(), &streets); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(street)
+	err = json.NewEncoder(w).Encode(streets)
 	if err != nil {
 		return
 	}
