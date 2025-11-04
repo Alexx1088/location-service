@@ -9,6 +9,7 @@ import (
 	"location-service/internal/service"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type CityController struct {
@@ -37,14 +38,21 @@ func (c *CityController) CreateCity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	city := model.City{Name: req.Name}
-	if err := c.service.CreateCity(r.Context(), &city); err != nil {
+	cities := model.City{Name: req.Name}
+	if err := c.service.CreateCity(r.Context(), &cities); err != nil {
+		if strings.Contains(err.Error(), "already exists") {
+			if strings.Contains(err.Error(), "already exists") {
+				http.Error(w, err.Error(), http.StatusConflict)
+				return
+			}
+			http.Error(w, err.Error(), http.StatusConflict)
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	err := json.NewEncoder(w).Encode(city)
+	err := json.NewEncoder(w).Encode(cities)
 	if err != nil {
 		return
 	}
@@ -69,13 +77,13 @@ func (c *CityController) GetCity(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid id", http.StatusBadRequest)
 		return
 	}
-	city, err := c.service.GetCity(r.Context(), id)
+	citi, err := c.service.GetCity(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(city)
+	err = json.NewEncoder(w).Encode(citi)
 	if err != nil {
 		return
 	}
@@ -101,17 +109,21 @@ func (c *CityController) UpdateCity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	city := model.City{
+	cities := model.City{
 		Id:   int64(id),
 		Name: req.Name,
 	}
 
-	if err := c.service.UpdateCity(r.Context(), &city); err != nil {
+	if err := c.service.UpdateCity(r.Context(), &cities); err != nil {
+		if strings.Contains(err.Error(), "already exists") {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(city)
+	err = json.NewEncoder(w).Encode(cities)
 	if err != nil {
 		return
 	}

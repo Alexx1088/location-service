@@ -2,8 +2,11 @@ package repository
 
 import (
 	"context"
+	"errors"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"location-service/internal/model"
+	"strings"
 )
 
 type StreetRepository struct {
@@ -18,6 +21,16 @@ func (r *StreetRepository) Create(ctx context.Context, street *model.Street) err
 	query := `INSERT INTO streets (name) VALUES ($1) RETURNING id`
 	err := r.db.QueryRow(ctx, query, street.Name).Scan(&street.Id)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			switch pgErr.Code {
+			case "23505":
+				if strings.Contains(pgErr.ConstraintName, "unique_street_name") {
+					return errors.New("street with this name already exists")
+				}
+			}
+		}
+
 		return err
 	}
 	return nil
@@ -61,6 +74,15 @@ func (r *StreetRepository) Update(ctx context.Context, street *model.Street) err
 	query := `UPDATE streets SET name = $1 where id = $2`
 	_, err := r.db.Exec(ctx, query, street.Name, street.Id)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			switch pgErr.Code {
+			case "23505":
+				if strings.Contains(pgErr.Message, "unique_street_name") {
+					return errors.New("street with this name already exists")
+				}
+			}
+		}
 		return err
 	}
 

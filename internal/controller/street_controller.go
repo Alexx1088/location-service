@@ -9,6 +9,7 @@ import (
 	"location-service/internal/service"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type StreetController struct {
@@ -42,6 +43,10 @@ func (c *StreetController) CreateStreet(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if err := c.service.CreateStreet(r.Context(), &streets); err != nil {
+		if strings.Contains(err.Error(), "already exists") {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -108,6 +113,10 @@ func (c *StreetController) UpdateStreet(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if err := c.service.UpdateStreet(r.Context(), &streets); err != nil {
+		if strings.Contains(err.Error(), "already exists") {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

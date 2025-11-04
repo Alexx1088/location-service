@@ -92,6 +92,11 @@ func (r *CrossroadRepository) Update(ctx context.Context, crossroad *model.Cross
 				if strings.Contains(pgErr.Message, "city_id") {
 					return errors.New("city does not exist")
 				}
+
+			case "23505":
+				if strings.Contains(pgErr.ConstraintName, "unique_crossroad") {
+					return errors.New("crossroad already exists for this street and city")
+				}
 			}
 		}
 		return err

@@ -5,28 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="834cedab-a922-4379-ac46-73fc1787b91a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/internal/db/migrations/000004_remove_city_id_from_streets.down.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/db/migrations/000004_remove_city_id_from_streets.up.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/db/migrations/000005_add_city_id_to_crossroads.down.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/db/migrations/000005_add_city_id_to_crossroads.up.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/db/migrations/000006_add_unique_crossroad_constraint.down.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/db/migrations/000006_add_unique_crossroad_constraint.up.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/dto/city/create_city_request.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/dto/city/update_city_request.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/dto/crossroad/create_crossroad_request.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/dto/crossroad/update_crossroad_request.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/dto/street/create_street_request.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/dto/street/update_street_request.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/db/migrations/000007_add_unique_city_and_street_constraint.down.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/db/migrations/000007_add_unique_city_and_street_constraint.up.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/controller/city_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/controller/city_controller.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/controller/crossroad_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/controller/crossroad_controller.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/controller/street_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/controller/street_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/model/crossroad.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/model/crossroad.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/model/street.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/model/street.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/repository/city_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/repository/city_repository.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/repository/crossroad_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/repository/crossroad_repository.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/repository/street_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/repository/street_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/service/crossroad_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/service/crossroad_service.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -115,6 +115,10 @@ func (c *CrossroadController) UpdateCrossroad(w http.ResponseWriter, r *http.Req
 		StreetId: *req.StreetId,
 	}
 	if err := c.service.UpdateCrossroad(r.Context(), &crossroads); err != nil {
+		if strings.Contains(err.Error(), "already exists") {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
