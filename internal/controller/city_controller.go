@@ -104,6 +104,7 @@ func (c *CityController) UpdateCity(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
+
 	if err := c.validate.Struct(req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

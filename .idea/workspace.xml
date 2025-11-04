@@ -5,15 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="834cedab-a922-4379-ac46-73fc1787b91a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/internal/db/migrations/000007_add_unique_city_and_street_constraint.down.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/db/migrations/000007_add_unique_city_and_street_constraint.up.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/controller/city_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/controller/city_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/controller/crossroad_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/controller/crossroad_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/controller/street_controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/controller/street_controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/repository/city_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/repository/city_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/repository/crossroad_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/repository/crossroad_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/repository/street_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/repository/street_repository.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,23 +38,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultGoTemplateProperty": "Go File",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "git-widget-placeholder": "feature/crossroads",
-    "go.import.settings.migrated": "true",
-    "last_opened_file_path": "/home/alexx/Programming/Go/projects/location-service/internal/db/migrations",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "/home/alexx/Programming/Go/projects/location-service/main.go"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/crossroads&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/alexx/Programming/Go/projects/location-service/internal/db/migrations&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;/home/alexx/Programming/Go/projects/location-service/main.go&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/internal/db/migrations" />
