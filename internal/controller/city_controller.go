@@ -24,6 +24,17 @@ func NewCityController(service *service.CityService) *CityController {
 	}
 }
 
+// CreateCity godoc
+// @Summary Create a new city
+// @Description Add a new city to the database
+// @Tags cities
+// @Accept json
+// @Produce json
+// @Param data body city.CreateCityRequest true "City data"
+// @Success 201 {object} model.City
+// @Failure 400 {string} string "Invalid input"
+// @Failure 409 {string} string "City already exists"
+// @Router /cities [post]
 func (c *CityController) CreateCity(w http.ResponseWriter, r *http.Request) {
 
 	var req city.CreateCityRequest
@@ -58,6 +69,13 @@ func (c *CityController) CreateCity(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ListCities godoc
+// @Summary Get all cities
+// @Description Get a list of all cities
+// @Tags cities
+// @Produce json
+// @Success 200 {array} model.City
+// @Router /cities [get]
 func (c *CityController) ListCities(w http.ResponseWriter, r *http.Request) {
 	cities, err := c.service.ListCities(r.Context())
 	if err != nil {
@@ -70,6 +88,16 @@ func (c *CityController) ListCities(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetCity godoc
+// @Summary Get city by ID
+// @Description Get city details by ID
+// @Tags cities
+// @Produce json
+// @Param id path int true "City ID"
+// @Success 200 {object} model.City
+// @Failure 400 {string} string "Invalid ID"
+// @Failure 404 {string} string "City not found"
+// @Router /cities/{id} [get]
 func (c *CityController) GetCity(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
@@ -89,6 +117,18 @@ func (c *CityController) GetCity(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UpdateCity godoc
+// @Summary Update city
+// @Description Update city name by ID
+// @Tags cities
+// @Accept json
+// @Produce json
+// @Param id path int true "City ID"
+// @Param data body city.UpdateCityRequest true "City data"
+// @Success 200 {object} model.City
+// @Failure 400 {string} string "Invalid input"
+// @Failure 404 {string} string "City not found"
+// @Router /cities/{id} [put]
 func (c *CityController) UpdateCity(w http.ResponseWriter, r *http.Request) {
 
 	idParam := chi.URLParam(r, "id")
@@ -130,6 +170,15 @@ func (c *CityController) UpdateCity(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeleteCity godoc
+// @Summary Delete city
+// @Description Remove a city by ID
+// @Tags cities
+// @Param id path int true "City ID"
+// @Success 204 "No content"
+// @Failure 400 {string} string "Invalid ID"
+// @Failure 404 {string} string "City not found"
+// @Router /cities/{id} [delete]
 func (c *CityController) DeleteCity(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)

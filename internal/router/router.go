@@ -7,10 +7,9 @@ import (
 	"location-service/internal/controller"
 	"location-service/internal/repository"
 	"location-service/internal/service"
-	"net/http"
 )
 
-func NewRouter(pool *pgxpool.Pool) http.Handler {
+func NewRouter(pool *pgxpool.Pool) *chi.Mux {
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)

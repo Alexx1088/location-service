@@ -1,0 +1,160 @@
+basePath: /
+definitions:
+  city.CreateCityRequest:
+    properties:
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+    required:
+    - name
+    type: object
+  city.UpdateCityRequest:
+    properties:
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+    type: object
+  model.City:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for managing cities, streets, and crossroads
+  title: Location Service API
+  version: "1.0"
+paths:
+  /cities:
+    get:
+      description: Get a list of all cities
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.City'
+            type: array
+      summary: Get all cities
+      tags:
+      - cities
+    post:
+      consumes:
+      - application/json
+      description: Add a new city to the database
+      parameters:
+      - description: City data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/city.CreateCityRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.City'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "409":
+          description: City already exists
+          schema:
+            type: string
+      summary: Create a new city
+      tags:
+      - cities
+  /cities/{id}:
+    delete:
+      description: Remove a city by ID
+      parameters:
+      - description: City ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No content
+        "400":
+          description: Invalid ID
+          schema:
+            type: string
+        "404":
+          description: City not found
+          schema:
+            type: string
+      summary: Delete city
+      tags:
+      - cities
+    get:
+      description: Get city details by ID
+      parameters:
+      - description: City ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.City'
+        "400":
+          description: Invalid ID
+          schema:
+            type: string
+        "404":
+          description: City not found
+          schema:
+            type: string
+      summary: Get city by ID
+      tags:
+      - cities
+    put:
+      consumes:
+      - application/json
+      description: Update city name by ID
+      parameters:
+      - description: City ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: City data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/city.UpdateCityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.City'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "404":
+          description: City not found
+          schema:
+            type: string
+      summary: Update city
+      tags:
+      - cities
+swagger: "2.0"

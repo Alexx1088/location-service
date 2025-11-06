@@ -21,7 +21,7 @@ func NewCityRepository(db *pgxpool.Pool) *CityRepository {
 func (r *CityRepository) Create(ctx context.Context, city *model.City) error {
 	query := `INSERT INTO cities (name) VALUES ($1) RETURNING id`
 
-	err := r.db.QueryRow(ctx, query, city.Name).Scan(&city)
+	err := r.db.QueryRow(ctx, query, city.Name).Scan(&city.Id)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
