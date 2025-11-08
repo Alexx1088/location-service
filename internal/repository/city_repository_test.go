@@ -18,9 +18,7 @@ func setupTestDB(t *testing.T) *pgxpool.Pool {
 	}
 	t.Logf("connecting to %s", dsn)
 
-	if strings.Contains(dsn, "location?") {
-		dsn = strings.Replace(dsn, "location?", "location_test?", 1)
-	}
+	dsn = strings.Replace(dsn, "location?", "location_test?", 1)
 
 	db, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {
