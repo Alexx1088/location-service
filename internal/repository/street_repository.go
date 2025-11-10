@@ -9,6 +9,14 @@ import (
 	"strings"
 )
 
+type StreetRepositoryInterface interface {
+	Create(ctx context.Context, city *model.Street) error
+	GetAll(ctx context.Context) ([]model.Street, error)
+	GetByID(ctx context.Context, id int) (*model.Street, error)
+	Update(ctx context.Context, city *model.Street) error
+	Delete(ctx context.Context, id int) error
+}
+
 type StreetRepository struct {
 	db *pgxpool.Pool
 }
