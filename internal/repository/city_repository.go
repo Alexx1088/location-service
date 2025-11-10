@@ -10,6 +10,14 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type CityRepositoryInterface interface {
+	Create(ctx context.Context, city *model.City) error
+	GetAll(ctx context.Context) ([]model.City, error)
+	GetByID(ctx context.Context, id int) (*model.City, error)
+	Update(ctx context.Context, city *model.City) error
+	Delete(ctx context.Context, id int) error
+}
+
 type CityRepository struct {
 	db *pgxpool.Pool
 }
@@ -85,5 +93,8 @@ func (r *CityRepository) Update(ctx context.Context, city *model.City) error {
 		}
 		return err
 	}
+
 	return nil
 }
+
+var _ CityRepositoryInterface = (*CityRepository)(nil)
