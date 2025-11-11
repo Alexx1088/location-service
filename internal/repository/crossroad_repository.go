@@ -11,6 +11,14 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type CrossroadRepositoryInterface interface {
+	Create(ctx context.Context, city *model.Crossroad) error
+	GetAll(ctx context.Context) ([]model.Crossroad, error)
+	GetByID(ctx context.Context, id int) (*model.Crossroad, error)
+	Update(ctx context.Context, city *model.Crossroad) error
+	Delete(ctx context.Context, id int) error
+	FindByStreetAndCity(ctx context.Context, streetId, cityId int64) (*model.Crossroad, error)
+}
 type CrossroadRepository struct {
 	db *pgxpool.Pool
 }

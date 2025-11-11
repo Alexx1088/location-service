@@ -9,10 +9,10 @@ import (
 )
 
 type CrossroadService struct {
-	repo *repository.CrossroadRepository
+	repo repository.CrossroadRepositoryInterface
 }
 
-func NewCrossroadService(repo *repository.CrossroadRepository) *CrossroadService {
+func NewCrossroadService(repo repository.CrossroadRepositoryInterface) *CrossroadService {
 	return &CrossroadService{repo: repo}
 }
 
