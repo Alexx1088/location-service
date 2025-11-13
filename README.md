@@ -1,27 +1,3 @@
-# location-service
-The service provides information about **cities**, **streets**, and **crossroads**.
-
-## Entity schema
-### City
-```
-- id
-- name
-```
-### Street
-```
-- id
-- name
-- city_id
-```
-### Crossroad
-```
-- id
-- street_id
-```
-
-## Requirements:
-The location-service must implement simple **CRUD** operations (```controller```, ```service``` and ```repository``` layers) for all entities.
-
 # Location Service
 
 Сервис для управления городами и улицами.  
@@ -72,6 +48,18 @@ go run cmd/location-service/main.go
 ### после запуска приложение будет доступно по адресу:
 http://localhost:8080
 
+## TODO 
+
+1) create the ```Crossing``` entity:
+### Crossing
+```
+- id
+- crossroad_id
+- event_time
+```
+2) implement the ```create``` and ```getAll``` REST methods. The ```getAll``` method should include pagination, 
+with ```from``` and ```to``` query params for filtering by date and a ```crossroad``` query param for filtering 
+by ```crossroad_id```
 
 ## Эндпойнты
 
