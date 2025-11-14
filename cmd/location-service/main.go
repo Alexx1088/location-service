@@ -18,7 +18,9 @@ import (
 
 func main() {
 
+	db.RunMigrations()
 	pool := db.Connect()
+
 	defer pool.Close()
 
 	r := router.NewRouter(pool)
