@@ -38,17 +38,11 @@ go version
 #### пример вывода:
 go version go1.24.1 linux/amd64
 
-### 2. Клонирование репозитория
-
-```bash
-git clone https://github.com/xp10it/location-service.git  
-cd location-service
-```
-### 3. Создать файл с переменными окружения
+### 2. После клонирования репозитория, создать файл с переменными окружения
 #### запустить команду в корне проекта:
 cp .env.example .env
 
-## 4. Поднять PostgreSQL (через Docker)
+## 3. Поднять PostgreSQL (через Docker)
 ###  cборка и запуск контейнеров:
 
 ```bash
@@ -58,14 +52,14 @@ docker compose up -d
 ### проверить, что контейнеры поднялись: 
 docker ps
 
-## 5. Применить миграции
+## 4. Применить миграции
 ### зайти в контейнер "арр",
 docker exec -it location-service sh
 
 ### выполнить там команду:
 migrate -path internal/db/migrations -database "$DATABASE_URL" up
 
-## 6. Запустить приложение 
+## 5. Запустить приложение 
 ### выполнить команду:
 go run cmd/location-service/main.go
 

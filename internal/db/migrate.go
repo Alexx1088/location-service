@@ -11,12 +11,12 @@ import (
 )
 
 func RunMigrations() {
+	//	dsn := GetDatabaseURL()
 
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
 		dsn = "postgres://user:password@localhost:5432/location?sslmode=disable"
 	}
-
 	sqlDB, err := sql.Open("pgx", dsn)
 	if err != nil {
 		log.Fatalf("failed to open sql connection: %v", err)
