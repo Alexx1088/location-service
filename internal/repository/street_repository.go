@@ -51,7 +51,7 @@ func (r *StreetRepository) GetAll(ctx context.Context) ([]model.Street, error) {
 	}
 	defer rows.Close()
 
-	var streets []model.Street
+	streets := []model.Street{}
 	for rows.Next() {
 		var s model.Street
 
