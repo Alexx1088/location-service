@@ -2,8 +2,11 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
+	"github.com/jackc/pgx/v5"
 	"location-service/internal/dto/street"
 	"location-service/internal/model"
 	"location-service/internal/service"
@@ -69,22 +72,40 @@ func (c *StreetController) ListStreets(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *StreetController) GetStreet(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "invalid id", http.StatusBadRequest)
-		return
-	}
-	street, err := c.service.GetStreet(r.Context(), id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"errorCode":    400,
+			"errorMessage": "Invalid id",
+		})
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(street)
+	street, err := c.service.GetStreet(r.Context(), id)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"errorCode":    404,
+				"errorMessage": fmt.Sprintf("Street with id: %d not found", id),
+			})
+			return
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"errorCode":    500,
+			"errorMessage": "Internal Server Error",
+		})
 		return
 	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(street)
 }
 
 func (c *StreetController) UpdateStreet(w http.ResponseWriter, r *http.Request) {
