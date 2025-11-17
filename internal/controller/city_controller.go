@@ -2,8 +2,11 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
+	"github.com/jackc/pgx/v5"
 	"location-service/internal/dto/city"
 	"location-service/internal/model"
 	"location-service/internal/service"
@@ -99,20 +102,50 @@ func (c *CityController) ListCities(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {string} string "City not found"
 // @Router /cities/{id} [get]
 func (c *CityController) GetCity(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "invalid id", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		err := json.NewEncoder(w).Encode(map[string]interface{}{
+			"errorCode":    400,
+			"errorMessage": "Invalid id",
+		})
+		if err != nil {
+			return
+		}
 		return
 	}
 	citi, err := c.service.GetCity(r.Context(), id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		if errors.Is(err, pgx.ErrNoRows) {
+			w.WriteHeader(http.StatusNotFound)
+			err := json.NewEncoder(w).Encode(map[string]interface{}{
+				"errorCode":    404,
+				"errorMessage": fmt.Sprintf("City with id: %d not found", id),
+			})
+			if err != nil {
+				return
+			}
+			return
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		err := json.NewEncoder(w).Encode(map[string]interface{}{
+			"errorCode":    500,
+			"errorMessage": "Internal Server Error",
+		})
+		if err != nil {
+			return
+		}
 		return
 	}
-
+	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(citi)
 	if err != nil {
+
 		return
 	}
 }

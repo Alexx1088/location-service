@@ -52,7 +52,7 @@ func (r *CityRepository) GetAll(ctx context.Context) ([]model.City, error) {
 	}
 	defer rows.Close()
 
-	var cities []model.City
+	cities := []model.City{}
 	for rows.Next() {
 		var c model.City
 		if err := rows.Scan(&c.Id, &c.Name); err != nil {

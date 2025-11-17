@@ -60,7 +60,7 @@ func (r *CrossroadRepository) GetAll(ctx context.Context) ([]model.Crossroad, er
 	}
 	defer rows.Close()
 
-	var crossroads []model.Crossroad
+	crossroads := []model.Crossroad{}
 	for rows.Next() {
 		var s model.Crossroad
 		if err := rows.Scan(&s.Id, &s.StreetId, &s.CityId); err != nil {

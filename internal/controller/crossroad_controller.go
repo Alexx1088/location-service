@@ -2,9 +2,13 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
+	"github.com/jackc/pgx/v5"
 	"location-service/internal/dto/crossroad"
+	"location-service/internal/http/response"
 	"location-service/internal/model"
 	"location-service/internal/service"
 	"net/http"
@@ -27,9 +31,17 @@ func NewCrossroadController(s *service.CrossroadService) *CrossroadController {
 func (c *CrossroadController) CreateCrossroad(w http.ResponseWriter, r *http.Request) {
 
 	var req crossroad.CreateCrossroadRequest
-
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if strings.Contains(err.Error(), "street_id") {
+			response.JSONError(w, http.StatusBadRequest, "invalid street_id")
+			return
+		}
+		if strings.Contains(err.Error(), "city_id") {
+			response.JSONError(w, http.StatusBadRequest, "invalid city_id")
+			return
+		}
+
+		response.JSONError(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
@@ -44,18 +56,38 @@ func (c *CrossroadController) CreateCrossroad(w http.ResponseWriter, r *http.Req
 	}
 
 	if err := c.service.CreateCrossroad(r.Context(), &crossroads); err != nil {
-		if strings.Contains(err.Error(), "already exists") {
-			http.Error(w, err.Error(), http.StatusConflict)
+		w.Header().Set("Content-Type", "application/json")
+
+		switch {
+		case strings.Contains(err.Error(), "does not exist"):
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"errorCode":    400,
+				"errorMessage": err.Error(),
+			})
+			return
+
+		case strings.Contains(err.Error(), "already exists"):
+			w.WriteHeader(http.StatusConflict)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"errorCode":    409,
+				"errorMessage": err.Error(),
+			})
+			return
+
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+			err := json.NewEncoder(w).Encode(map[string]interface{}{
+				"errorCode":    500,
+				"errorMessage": "Internal Server Error",
+			})
+			if err != nil {
+				return
+			}
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
 	}
-	err := json.NewEncoder(w).Encode(crossroads)
-	if err != nil {
-		return
-	}
-
+	response.JSON(w, http.StatusCreated, crossroads)
 }
 
 func (c *CrossroadController) ListCrossroads(w http.ResponseWriter, r *http.Request) {
@@ -71,18 +103,48 @@ func (c *CrossroadController) ListCrossroads(w http.ResponseWriter, r *http.Requ
 }
 
 func (c *CrossroadController) GetCrossroad(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "invalid id", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		err := json.NewEncoder(w).Encode(map[string]interface{}{
+			"errorCode":    400,
+			"errorMessage": "Invalid id",
+		})
+		if err != nil {
+			return
+		}
 		return
 	}
 	crossroad, err := c.service.GetCrossroad(r.Context(), id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		if errors.Is(err, pgx.ErrNoRows) {
+			w.WriteHeader(http.StatusNotFound)
+			err := json.NewEncoder(w).Encode(map[string]interface{}{
+				"errorCode":    404,
+				"errorMessage": fmt.Sprintf("Crossroad with id: %d not found", id),
+			})
+			if err != nil {
+				return
+			}
+			return
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		err = json.NewEncoder(w).Encode(map[string]interface{}{
+			"errorCode":    500,
+			"errorMessage": "Internal Server Error",
+		})
+		if err != nil {
+			return
+		}
 		return
 	}
 
+	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(crossroad)
 	if err != nil {
 		return

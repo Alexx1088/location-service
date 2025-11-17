@@ -79,10 +79,13 @@ func (c *StreetController) GetStreet(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		err := json.NewEncoder(w).Encode(map[string]interface{}{
 			"errorCode":    400,
 			"errorMessage": "Invalid id",
 		})
+		if err != nil {
+			return
+		}
 		return
 	}
 
@@ -90,22 +93,31 @@ func (c *StreetController) GetStreet(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			w.WriteHeader(http.StatusNotFound)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			err := json.NewEncoder(w).Encode(map[string]interface{}{
 				"errorCode":    404,
 				"errorMessage": fmt.Sprintf("Street with id: %d not found", id),
 			})
+			if err != nil {
+				return
+			}
 			return
 		}
 
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		err := json.NewEncoder(w).Encode(map[string]interface{}{
 			"errorCode":    500,
 			"errorMessage": "Internal Server Error",
 		})
+		if err != nil {
+			return
+		}
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(street)
+	err = json.NewEncoder(w).Encode(street)
+	if err != nil {
+		return
+	}
 }
 
 func (c *StreetController) UpdateStreet(w http.ResponseWriter, r *http.Request) {
