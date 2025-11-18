@@ -2,10 +2,21 @@ package repository
 
 import (
 	"context"
+	"errors"
+	"github.com/jackc/pgx/v5/pgconn"
 	"location-service/internal/model"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+type CityRepositoryInterface interface {
+	Create(ctx context.Context, city *model.City) error
+	GetAll(ctx context.Context) ([]model.City, error)
+	GetByID(ctx context.Context, id int) (*model.City, error)
+	Update(ctx context.Context, city *model.City) error
+	Delete(ctx context.Context, id int) error
+}
 
 type CityRepository struct {
 	db *pgxpool.Pool
@@ -16,7 +27,22 @@ func NewCityRepository(db *pgxpool.Pool) *CityRepository {
 }
 
 func (r *CityRepository) Create(ctx context.Context, city *model.City) error {
-	return r.db.QueryRow(ctx, "INSERT INTO cities (name) VALUES ($1) RETURNING id", city.Name).Scan(&city.Id)
+	query := `INSERT INTO cities (name) VALUES ($1) RETURNING id`
+
+	err := r.db.QueryRow(ctx, query, city.Name).Scan(&city.Id)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			switch pgErr.Code {
+			case "23505":
+				if strings.Contains(pgErr.ConstraintName, "unique_city_name") {
+					return errors.New("city with this name already exists")
+				}
+			}
+		}
+		return err
+	}
+	return nil
 }
 
 func (r *CityRepository) GetAll(ctx context.Context) ([]model.City, error) {
@@ -26,7 +52,7 @@ func (r *CityRepository) GetAll(ctx context.Context) ([]model.City, error) {
 	}
 	defer rows.Close()
 
-	var cities []model.City
+	cities := []model.City{}
 	for rows.Next() {
 		var c model.City
 		if err := rows.Scan(&c.Id, &c.Name); err != nil {
@@ -55,5 +81,20 @@ func (r *CityRepository) Delete(ctx context.Context, id int) error {
 func (r *CityRepository) Update(ctx context.Context, city *model.City) error {
 	query := "UPDATE cities SET name=$1 where id=$2"
 	_, err := r.db.Exec(ctx, query, city.Name, city.Id)
-	return err
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			switch pgErr.Code {
+			case "23505":
+				if strings.Contains(pgErr.ConstraintName, "unique_city_name") {
+					return errors.New("city with this name already exists")
+				}
+			}
+		}
+		return err
+	}
+
+	return nil
 }
+
+var _ CityRepositoryInterface = (*CityRepository)(nil)

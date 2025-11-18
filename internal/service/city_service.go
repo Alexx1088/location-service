@@ -7,10 +7,10 @@ import (
 )
 
 type CityService struct {
-	repo *repository.CityRepository
+	repo repository.CityRepositoryInterface
 }
 
-func NewCityService(repo *repository.CityRepository) *CityService {
+func NewCityService(repo repository.CityRepositoryInterface) *CityService {
 	return &CityService{repo: repo}
 }
 

@@ -13,7 +13,7 @@ RUN go mod download
 
 # Copy source code and build the Go binary
 COPY . .
-RUN go build -o location-service ./cmd/main.go
+RUN go build -o location-service ./cmd/location-service/main.go
 
 # Final stage (runtime)
 FROM alpine:latest

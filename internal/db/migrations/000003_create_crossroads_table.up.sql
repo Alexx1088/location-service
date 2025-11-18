@@ -1,0 +1,4 @@
+CREATE TABLE crossroads (
+    id SERIAL PRIMARY KEY,
+    street_id INTEGER NOT NULL REFERENCES streets(id) ON DELETE CASCADE
+    );
