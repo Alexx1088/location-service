@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	_ "github.com/joho/godotenv/autoload"
 	httpSwagger "github.com/swaggo/http-swagger"
 	_ "location-service/cmd/location-service/docs"
 	"location-service/internal/db"
 	"location-service/internal/router"
-
 	"net/http"
 )
 

@@ -61,18 +61,24 @@ func (c *CrossroadController) CreateCrossroad(w http.ResponseWriter, r *http.Req
 		switch {
 		case strings.Contains(err.Error(), "does not exist"):
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			err := json.NewEncoder(w).Encode(map[string]interface{}{
 				"errorCode":    400,
 				"errorMessage": err.Error(),
 			})
+			if err != nil {
+				return
+			}
 			return
 
 		case strings.Contains(err.Error(), "already exists"):
 			w.WriteHeader(http.StatusConflict)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			err := json.NewEncoder(w).Encode(map[string]interface{}{
 				"errorCode":    409,
 				"errorMessage": err.Error(),
 			})
+			if err != nil {
+				return
+			}
 			return
 
 		default:
