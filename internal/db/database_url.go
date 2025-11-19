@@ -6,6 +6,8 @@ import (
 )
 
 func GetDatabaseURL() string {
+	fmt.Println("DATABASE_URL =", os.Getenv("DATABASE_URL"))
+	fmt.Println(os.Getenv("DATABASE_URL"))
 	url := os.Getenv("DATABASE_URL")
 	if url != "" {
 		return url
