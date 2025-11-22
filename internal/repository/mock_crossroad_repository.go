@@ -39,3 +39,8 @@ func (m *MockCrossroadRepository) FindByStreetAndCity(ctx context.Context, stree
 	args := m.Called(ctx, streetId, cityId)
 	return args.Get(0).(*model.Crossroad), args.Error(1)
 }
+
+func (m *MockCrossroadRepository) Exists(ctx context.Context, id int) (bool, error) {
+	args := m.Called(ctx, id)
+	return args.Bool(0), args.Error(1)
+}
