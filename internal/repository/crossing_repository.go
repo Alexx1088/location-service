@@ -84,7 +84,6 @@ FROM crossings  c
 		argIndex, argIndex+1,
 	)
 	args = append(args, filter.Limit, filter.Offset)
-	argIndex += 2
 
 	rows, err := r.db.Query(ctx, baseQuery, args...)
 	if err != nil {
@@ -111,5 +110,8 @@ FROM crossings  c
 		results = append(results, item)
 	}
 
+	if results == nil {
+		results = []crossing.WithAddressDTO{}
+	}
 	return results, nil
 }

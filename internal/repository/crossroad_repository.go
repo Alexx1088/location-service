@@ -18,6 +18,7 @@ type CrossroadRepositoryInterface interface {
 	Update(ctx context.Context, city *model.Crossroad) error
 	Delete(ctx context.Context, id int) error
 	FindByStreetAndCity(ctx context.Context, streetId, cityId int64) (*model.Crossroad, error)
+	Exists(ctx context.Context, id int) (bool, error)
 }
 type CrossroadRepository struct {
 	db *pgxpool.Pool
@@ -128,4 +129,20 @@ func (r *CrossroadRepository) FindByStreetAndCity(ctx context.Context, streetId,
 		return nil, err
 	}
 	return &crossroad, nil
+}
+
+func (r *CrossroadRepository) Exists(ctx context.Context, id int) (bool, error) {
+	var exists bool
+
+	err := r.db.QueryRow(
+		ctx,
+		"SELECT EXISTS (SELECT 1 FROM crossroads WHERE id = $1)",
+		id,
+	).Scan(&exists)
+
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
 }
