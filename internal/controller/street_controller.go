@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5"
 	"location-service/internal/dto/street"
+	"location-service/internal/http/response"
 	"location-service/internal/model"
 	"location-service/internal/service"
 	"net/http"
@@ -32,43 +33,38 @@ func (c *StreetController) CreateStreet(w http.ResponseWriter, r *http.Request) 
 	var req street.CreateStreetRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, "invalid JSON")
 		return
 	}
 
 	if err := c.validate.Struct(req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	streets := model.Street{
+	streetModel := model.Street{
 		Name: req.Name,
 	}
 
-	if err := c.service.CreateStreet(r.Context(), &streets); err != nil {
+	if err := c.service.CreateStreet(r.Context(), &streetModel); err != nil {
 		if strings.Contains(err.Error(), "already exists") {
-			http.Error(w, err.Error(), http.StatusConflict)
+			response.JSONError(w, http.StatusConflict, err.Error())
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.JSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	err := json.NewEncoder(w).Encode(streets)
-	if err != nil {
-		return
-	}
+	response.JSON(w, http.StatusCreated, streetModel)
+
 }
 
 func (c *StreetController) ListStreets(w http.ResponseWriter, r *http.Request) {
 	streets, err := c.service.ListStreets(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.JSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	err = json.NewEncoder(w).Encode(streets)
-	if err != nil {
-		return
-	}
+	response.JSON(w, http.StatusCreated, streets)
 }
 
 func (c *StreetController) GetStreet(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +85,7 @@ func (c *StreetController) GetStreet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	street, err := c.service.GetStreet(r.Context(), id)
+	streetModel, err := c.service.GetStreet(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			w.WriteHeader(http.StatusNotFound)
@@ -114,29 +110,27 @@ func (c *StreetController) GetStreet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(street)
-	if err != nil {
-		return
-	}
+
+	response.JSON(w, http.StatusCreated, streetModel)
 }
 
 func (c *StreetController) UpdateStreet(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "invalid id", http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, "invalid id")
 		return
 	}
 
 	var req street.UpdateStreetRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid JSON", http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, "invalid JSON")
 		return
 	}
 
 	if err := c.validate.Struct(req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -147,29 +141,25 @@ func (c *StreetController) UpdateStreet(w http.ResponseWriter, r *http.Request) 
 
 	if err := c.service.UpdateStreet(r.Context(), &streets); err != nil {
 		if strings.Contains(err.Error(), "already exists") {
-			http.Error(w, err.Error(), http.StatusConflict)
+			response.JSONError(w, http.StatusConflict, err.Error())
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.JSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	err = json.NewEncoder(w).Encode(streets)
-	if err != nil {
-		return
-	}
+	response.JSON(w, http.StatusCreated, streets)
 }
 
 func (c *StreetController) DeleteStreet(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "invalid id", http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, "invalid id")
 		return
 	}
 
 	if err := c.service.DeleteStreet(r.Context(), id); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.JSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

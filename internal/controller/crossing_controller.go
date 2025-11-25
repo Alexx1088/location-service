@@ -26,16 +26,16 @@ func (c *CrossingController) CreateCrossing(w http.ResponseWriter, r *http.Reque
 	var req crossing.CreateCrossingRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		writeJSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	if err := c.validate.Struct(req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		writeJSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err := c.service.CreateCrossing(r.Context(), &req); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		writeJSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -93,12 +93,23 @@ func (c *CrossingController) ListCrossings(w http.ResponseWriter, r *http.Reques
 
 	crossings, err := c.service.ListCrossings(r.Context(), filter)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		writeJSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(crossings); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		writeJSONError(w, http.StatusBadRequest, err.Error())
+	}
+}
+
+func writeJSONError(w http.ResponseWriter, status int, msg string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	err := json.NewEncoder(w).Encode(map[string]string{
+		"error": msg,
+	})
+	if err != nil {
+		return
 	}
 }

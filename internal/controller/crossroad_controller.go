@@ -46,7 +46,7 @@ func (c *CrossroadController) CreateCrossroad(w http.ResponseWriter, r *http.Req
 	}
 
 	if err := c.validate.Struct(req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -99,7 +99,7 @@ func (c *CrossroadController) CreateCrossroad(w http.ResponseWriter, r *http.Req
 func (c *CrossroadController) ListCrossroads(w http.ResponseWriter, r *http.Request) {
 	crossroads, err := c.service.ListCrossroads(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.JSONError(w, http.StatusInternalServerError, "Internal Server Error")
 		return
 	}
 	err = json.NewEncoder(w).Encode(crossroads)
@@ -125,7 +125,7 @@ func (c *CrossroadController) GetCrossroad(w http.ResponseWriter, r *http.Reques
 		}
 		return
 	}
-	crossroad, err := c.service.GetCrossroad(r.Context(), id)
+	crossroadModel, err := c.service.GetCrossroad(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			w.WriteHeader(http.StatusNotFound)
@@ -151,29 +151,26 @@ func (c *CrossroadController) GetCrossroad(w http.ResponseWriter, r *http.Reques
 	}
 
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(crossroad)
-	if err != nil {
-		return
-	}
+	response.JSON(w, http.StatusCreated, crossroadModel)
 }
 
 func (c *CrossroadController) UpdateCrossroad(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "invalid id", http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, "invalid id")
 		return
 	}
 
 	var req crossroad.UpdateStreetRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid JSON", http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, "invalid JSON")
 		return
 	}
 
 	if err := c.validate.Struct(req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -184,29 +181,25 @@ func (c *CrossroadController) UpdateCrossroad(w http.ResponseWriter, r *http.Req
 	}
 	if err := c.service.UpdateCrossroad(r.Context(), &crossroads); err != nil {
 		if strings.Contains(err.Error(), "already exists") {
-			http.Error(w, err.Error(), http.StatusConflict)
+			response.JSONError(w, http.StatusConflict, err.Error())
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.JSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	err = json.NewEncoder(w).Encode(crossroads)
-	if err != nil {
-		return
-	}
+	response.JSON(w, http.StatusCreated, crossroads)
 }
 
 func (c *CrossroadController) DeleteCrossroad(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "invalid id", http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, "invalid id")
 		return
 	}
 
 	if err := c.service.DeleteCrossroad(r.Context(), id); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.JSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
