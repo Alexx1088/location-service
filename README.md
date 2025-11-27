@@ -43,20 +43,35 @@ go run cmd/location-service/main.go
 http://localhost:8080
 
 ## TODO 
+<details>
+  <summary><del>1) Create the <code>Crossing</code> entity</del></summary>
 
-1) create the ```Crossing``` entity:
-### Crossing
-```
-- id
-- crossroad_id
-- event_time
-```
-2) implement the ```create``` and ```getAll``` REST methods. The ```getAll``` method should include pagination, 
-with ```from``` and ```to``` query params for filtering by date and a ```crossroad``` query param for filtering 
-by ```crossroad_id```
+  ```javascript
+  - id
+  - crossroad_id
+  - event_time
+  ```
+
+</details>
+<details>
+  <summary>
+    <del>2) Implement the <code>create</code>  and <code>getAll</code> REST methods.</del>
+  </summary>
+  The <code>getAll</code> method should include pagination, with <code>from</code> and <code>to</code> 
+  query params for filtering by date and a <code>crossroad</code> query param for filtering by 
+  <code>crossroad_id</code>
+</details>
+<details>
+  <summary>
+    3) Implement sending the <code>crossing event</code> to <code>kafka topic</code> using concurrency
+  </summary>
+  The main idea is implement saving to the <code>database</code> and sending to <code>kafka topic</code> at the same time.
+  This approach needs to consider the possibility of an inconsistent state 
+  (e.g., saving to the database succeeds, but sending to kafka fails — in which case, all actions should be rolled back.
+  If the database failed, kafka shouldn't receive the event
+</details>
 
 ## Эндпойнты
-
 ### Cities:
 #### получить город: GET http://localhost:8080/cities/{id}
 #### получить список городов: GET http://localhost:8080/cities
