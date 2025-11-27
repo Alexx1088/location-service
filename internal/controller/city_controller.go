@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5"
 	"location-service/internal/dto/city"
+	"location-service/internal/http/response"
 	"location-service/internal/model"
 	"location-service/internal/service"
 	"net/http"
@@ -39,37 +40,28 @@ func NewCityController(service *service.CityService) *CityController {
 // @Failure 409 {string} string "City already exists"
 // @Router /cities [post]
 func (c *CityController) CreateCity(w http.ResponseWriter, r *http.Request) {
-
 	var req city.CreateCityRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, "invalid JSON")
 		return
 	}
 
 	if err := c.validate.Struct(req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	cities := model.City{Name: req.Name}
-	if err := c.service.CreateCity(r.Context(), &cities); err != nil {
+	cityModel := model.City{Name: req.Name}
+	if err := c.service.CreateCity(r.Context(), &cityModel); err != nil {
 		if strings.Contains(err.Error(), "already exists") {
-			if strings.Contains(err.Error(), "already exists") {
-				http.Error(w, err.Error(), http.StatusConflict)
-				return
-			}
-			http.Error(w, err.Error(), http.StatusConflict)
+			response.JSONError(w, http.StatusConflict, err.Error())
+			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.JSONError(w, http.StatusInternalServerError, "Internal Server Error")
 		return
 	}
-
-	w.WriteHeader(http.StatusCreated)
-	err := json.NewEncoder(w).Encode(cities)
-	if err != nil {
-		return
-	}
+	response.JSON(w, http.StatusCreated, cityModel)
 }
 
 // ListCities godoc
@@ -167,19 +159,19 @@ func (c *CityController) UpdateCity(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "invalid id", http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, "invalid JSON")
 		return
 	}
 
 	var req city.UpdateCityRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid JSON", http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, "invalid JSON")
 		return
 	}
 
 	if err := c.validate.Struct(req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -190,17 +182,13 @@ func (c *CityController) UpdateCity(w http.ResponseWriter, r *http.Request) {
 
 	if err := c.service.UpdateCity(r.Context(), &cities); err != nil {
 		if strings.Contains(err.Error(), "already exists") {
-			http.Error(w, err.Error(), http.StatusConflict)
+			response.JSONError(w, http.StatusConflict, err.Error())
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.JSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	err = json.NewEncoder(w).Encode(cities)
-	if err != nil {
-		return
-	}
+	response.JSON(w, http.StatusCreated, cities)
 }
 
 // DeleteCity godoc
@@ -216,12 +204,12 @@ func (c *CityController) DeleteCity(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "invalid id", http.StatusBadRequest)
+		response.JSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err := c.service.DeleteCity(r.Context(), id); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response.JSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

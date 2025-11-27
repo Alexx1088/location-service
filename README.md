@@ -28,14 +28,7 @@ docker compose up -d
 ### проверить, что контейнеры поднялись: 
 docker ps
 
-## 4. Применить миграции
-### зайти в контейнер "арр",
-docker exec -it location-service sh
-
-### выполнить там команду:
-migrate -path internal/db/migrations -database "$DATABASE_URL" up
-
-## 5. Запустить приложение 
+## 4. Запустить приложение 
 ### выполнить команду:
 go run cmd/location-service/main.go
 
