@@ -27,7 +27,8 @@ func NewRouter(pool *pgxpool.Pool) *chi.Mux {
 	r.Mount("/crossroads", CrossroadRoutes(crossroadService))
 
 	crossingRepo := repository.NewCrossingRepository(pool)
-	crossingService := service.NewCrossingService(crossingRepo, crossroadRepo)
+	outboxRepo := repository.NewOutboxRepository()
+	crossingService := service.NewCrossingService(crossingRepo, crossroadRepo, outboxRepo)
 	r.Mount("/crossings", CrossingRoutes(crossingService))
 
 	return r

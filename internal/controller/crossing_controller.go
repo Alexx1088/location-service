@@ -34,13 +34,14 @@ func (c *CrossingController) CreateCrossing(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err := c.service.CreateCrossing(r.Context(), &req); err != nil {
+	created, err := c.service.CreateCrossing(r.Context(), &req)
+	if err != nil {
 		writeJSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(req); err != nil {
+	if err := json.NewEncoder(w).Encode(created); err != nil {
 		return
 	}
 }

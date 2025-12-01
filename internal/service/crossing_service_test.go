@@ -13,36 +13,42 @@ import (
 func TestCreateCrossing_Success(t *testing.T) {
 	crossingRepo := new(repository.MockCrossingRepository)
 	crossroadRepo := new(repository.MockCrossroadRepository)
+	outboxRepo := new(repository.MockOutboxRepository)
 
-	svc := NewCrossingService(crossingRepo, crossroadRepo)
+	svc := NewCrossingService(crossingRepo, crossroadRepo, outboxRepo)
 
-	eventTime, _ := time.Parse(time.RFC3339, "2025-11-12T10:00:00Z")
-
-	dto := &crossing.CreateCrossingRequest{
-		CrossroadID: 10,
-		EventTime:   eventTime,
+	req := &crossing.CreateCrossingRequest{
+		CrossroadID: 1,
+		EventTime:   time.Now(),
 	}
 
-	crossroadRepo.
-		On("Exists", mock.Anything, dto.CrossroadID).
-		Return(true, nil)
+	crossingRepo.
+		On("BeginTx", mock.Anything).
+		Return(nil, nil)
 
 	crossingRepo.
-		On("Create", mock.Anything, mock.AnythingOfType("*model.Crossing")).
+		On("CreateTx", mock.Anything, nil, mock.Anything).
 		Return(nil)
 
-	err := svc.CreateCrossing(context.Background(), dto)
-	assert.NoError(t, err)
+	crossroadRepo.
+		On("Exists", mock.Anything, 1).
+		Return(true, nil)
 
-	crossroadRepo.AssertExpectations(t)
-	crossingRepo.AssertExpectations(t)
+	outboxRepo.
+		On("AddEvent", mock.Anything, nil, mock.Anything).
+		Return(nil)
+
+	created, err := svc.CreateCrossing(context.Background(), req)
+	assert.NoError(t, err)
+	assert.NotNil(t, created)
 }
 
 func TestCreateCrossing_CrossroadNotFound(t *testing.T) {
 	crossingRepo := new(repository.MockCrossingRepository)
 	crossroadRepo := new(repository.MockCrossroadRepository)
+	outboxRepo := new(repository.MockOutboxRepository)
 
-	svc := NewCrossingService(crossingRepo, crossroadRepo)
+	svc := NewCrossingService(crossingRepo, crossroadRepo, outboxRepo)
 
 	dto := &crossing.CreateCrossingRequest{
 		CrossroadID: 99,
@@ -52,15 +58,17 @@ func TestCreateCrossing_CrossroadNotFound(t *testing.T) {
 		On("Exists", mock.Anything, dto.CrossroadID).
 		Return(false, nil)
 
-	err := svc.CreateCrossing(context.Background(), dto)
+	created, err := svc.CreateCrossing(context.Background(), dto)
+	assert.Nil(t, created)
 	assert.EqualError(t, err, "crossroad does not exists")
 }
 
 func TestListCrossings(t *testing.T) {
 	crossingRepo := new(repository.MockCrossingRepository)
 	crossroadRepo := new(repository.MockCrossroadRepository)
+	outboxRepo := new(repository.MockOutboxRepository)
 
-	svc := NewCrossingService(crossingRepo, crossroadRepo)
+	svc := NewCrossingService(crossingRepo, crossroadRepo, outboxRepo)
 
 	filter := crossing.FilterDTO{}
 
