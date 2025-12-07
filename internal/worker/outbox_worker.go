@@ -12,20 +12,26 @@ import (
 )
 
 type OutboxWorker struct {
-	repo  repository.OutboxRepositoryInterface
-	kafka sarama.SyncProducer
-	topic string
+	repo      repository.OutboxRepositoryInterface
+	kafka     sarama.SyncProducer
+	topic     string
+	batchSize int
+	interval  time.Duration
 }
 
 func NewOutboxWorker(
 	repo repository.OutboxRepositoryInterface,
 	kafka sarama.SyncProducer,
 	topic string,
+	batchSize int,
+	interval time.Duration,
 ) *OutboxWorker {
 	return &OutboxWorker{
-		repo:  repo,
-		kafka: kafka,
-		topic: topic,
+		repo:      repo,
+		kafka:     kafka,
+		topic:     topic,
+		batchSize: batchSize,
+		interval:  interval,
 	}
 }
 
@@ -33,7 +39,7 @@ func (w *OutboxWorker) Start() {
 	log.Println("[OUTBOX] Worker started")
 
 	go func() {
-		ticker := time.NewTicker(1 * time.Second)
+		ticker := time.NewTicker(w.interval)
 
 		for range ticker.C {
 			if err := w.processBatch(); err != nil {
@@ -46,7 +52,7 @@ func (w *OutboxWorker) Start() {
 func (w *OutboxWorker) processBatch() error {
 	ctx := context.Background()
 
-	events, err := w.repo.LockUnprocessed(ctx, 1000)
+	events, err := w.repo.LockUnprocessed(ctx, w.batchSize)
 	if err != nil {
 		return fmt.Errorf("failed to load events: %w", err)
 	}

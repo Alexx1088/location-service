@@ -11,9 +11,8 @@ type MockOutboxRepository struct {
 	mock.Mock
 }
 
-func (m *MockOutboxRepository) GetUnprocessed(ctx context.Context, limit int) ([]*model.OutboxEvent, error) {
-	args := m.Called(ctx, limit)
-	return args.Get(0).([]*model.OutboxEvent), args.Error(1)
+func (m *MockOutboxRepository) LockUnprocessed(ctx context.Context, limit int) ([]*model.OutboxEvent, error) {
+	return nil, nil
 }
 
 func (m *MockOutboxRepository) MarkProcessed(ctx context.Context, id int64) error {

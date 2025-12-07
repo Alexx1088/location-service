@@ -39,7 +39,7 @@ func (r *OutboxRepository) LockUnprocessed(ctx context.Context, limit int) ([]*m
 	defer func(tx pgx.Tx, ctx context.Context) {
 		err := tx.Rollback(ctx)
 		if err != nil {
-
+			_ = tx.Rollback(ctx)
 		}
 	}(tx, ctx)
 

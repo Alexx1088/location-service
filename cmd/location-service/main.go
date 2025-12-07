@@ -5,6 +5,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	httpSwagger "github.com/swaggo/http-swagger"
 	_ "location-service/cmd/location-service/docs"
+	"location-service/internal/config"
 	"location-service/internal/db"
 	"location-service/internal/kafka"
 	"location-service/internal/repository"
@@ -34,10 +35,17 @@ func main() {
 		log.Fatalf("Failed to create Kafka producer: %v", err)
 	}
 
+	cfg, err := config.Load("config/config.yaml")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	outboxWorker := worker.NewOutboxWorker(
 		outboxRepo,
 		producer,
 		"crossings.events",
+		cfg.Outbox.BatchSize,
+		cfg.Outbox.Interval,
 	)
 
 	outboxWorker.Start()
