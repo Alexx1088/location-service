@@ -6,7 +6,11 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 	_ "location-service/cmd/location-service/docs"
 	"location-service/internal/db"
+	"location-service/internal/kafka"
+	"location-service/internal/repository"
 	"location-service/internal/router"
+	"location-service/internal/worker"
+	"log"
 	"net/http"
 )
 
@@ -22,6 +26,21 @@ func main() {
 	pool := db.Connect()
 
 	defer pool.Close()
+
+	outboxRepo := repository.NewOutboxRepository(pool)
+
+	producer, err := kafka.NewKafkaProducer([]string{"localhost:9092"})
+	if err != nil {
+		log.Fatalf("Failed to create Kafka producer: %v", err)
+	}
+
+	outboxWorker := worker.NewOutboxWorker(
+		outboxRepo,
+		producer,
+		"crossings.events",
+	)
+
+	outboxWorker.Start()
 
 	r := router.NewRouter(pool)
 

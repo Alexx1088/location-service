@@ -33,7 +33,7 @@ func (w *OutboxWorker) Start() {
 	log.Println("[OUTBOX] Worker started")
 
 	go func() {
-		ticker := time.NewTicker(3 * time.Second)
+		ticker := time.NewTicker(1 * time.Second)
 
 		for range ticker.C {
 			if err := w.processBatch(); err != nil {
@@ -46,9 +46,9 @@ func (w *OutboxWorker) Start() {
 func (w *OutboxWorker) processBatch() error {
 	ctx := context.Background()
 
-	events, err := w.repo.GetUnprocessed(ctx, 20)
+	events, err := w.repo.LockUnprocessed(ctx, 1000)
 	if err != nil {
-		return fmt.Errorf("faicled to load events: %w", err)
+		return fmt.Errorf("failed to load events: %w", err)
 	}
 
 	if len(events) == 0 {
