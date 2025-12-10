@@ -7,7 +7,18 @@ import (
 )
 
 type Config struct {
+	Server ServerConfig `yaml:"server"`
+	Kafka  KafkaConfig  `yaml:"kafka"`
 	Outbox OutboxConfig `yaml:"outbox"`
+}
+
+type ServerConfig struct {
+	Host string `yaml:"host"`
+	Port string `yaml:"port"`
+}
+
+type KafkaConfig struct {
+	Brokers []string `yaml:"brokers"`
 }
 
 type OutboxConfig struct {

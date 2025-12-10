@@ -30,14 +30,14 @@ func main() {
 
 	outboxRepo := repository.NewOutboxRepository(pool)
 
-	producer, err := kafka.NewKafkaProducer([]string{"localhost:9092"})
-	if err != nil {
-		log.Fatalf("Failed to create Kafka producer: %v", err)
-	}
-
 	cfg, err := config.Load("config/config.yaml")
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	producer, err := kafka.NewKafkaProducer(cfg.Kafka.Brokers)
+	if err != nil {
+		log.Fatalf("Failed to create Kafka producer: %v", err)
 	}
 
 	outboxWorker := worker.NewOutboxWorker(
@@ -53,10 +53,13 @@ func main() {
 	r := router.NewRouter(pool)
 
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
-	fmt.Println("Swagger docs: http://localhost:8080/swagger/index.html")
+	swaggerURL := fmt.Sprintf("http://%s:%s/swagger/index.html", cfg.Server.Host, cfg.Server.Port)
+	fmt.Println("Swagger docs:", swaggerURL)
 
-	fmt.Println("Server running on :8080")
-	if err := http.ListenAndServe(":8080", r); err != nil {
+	address := fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port)
+
+	fmt.Println("Server running on:", address)
+	if err := http.ListenAndServe(address, r); err != nil {
 		panic(err)
 	}
 }
