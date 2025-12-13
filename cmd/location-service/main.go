@@ -35,6 +35,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	fmt.Printf("Using Kafka brokers: %v\n", cfg.Kafka.Brokers)
+
 	producer, err := kafka.NewKafkaProducer(cfg.Kafka.Brokers)
 	if err != nil {
 		log.Fatalf("Failed to create Kafka producer: %v", err)
