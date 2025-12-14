@@ -35,18 +35,23 @@ func NewOutboxWorker(
 	}
 }
 
-func (w *OutboxWorker) Start() {
+func (w *OutboxWorker) Start(ctx context.Context) {
 	log.Println("[OUTBOX] Worker started")
 
-	go func() {
-		ticker := time.NewTicker(w.interval)
+	ticker := time.NewTicker(w.interval)
+	defer ticker.Stop()
 
-		for range ticker.C {
+	for {
+		select {
+		case <-ctx.Done():
+			log.Println("[OUTBOX] Worker stopped")
+			return
+		case <-ticker.C:
 			if err := w.processBatch(); err != nil {
 				log.Println("[OUTBOX] Worker error:", err)
 			}
 		}
-	}()
+	}
 }
 
 func (w *OutboxWorker) processBatch() error {

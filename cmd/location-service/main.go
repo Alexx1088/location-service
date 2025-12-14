@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	_ "github.com/joho/godotenv/autoload"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -42,15 +43,22 @@ func main() {
 		log.Fatalf("Failed to create Kafka producer: %v", err)
 	}
 
-	outboxWorker := worker.NewOutboxWorker(
-		outboxRepo,
-		producer,
-		"crossings.events",
-		cfg.Outbox.BatchSize,
-		cfg.Outbox.Interval,
-	)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	outboxWorker.Start()
+	workers := cfg.Outbox.WorkersCount
+
+	for i := 0; i < workers; i++ {
+		w := worker.NewOutboxWorker(
+			outboxRepo,
+			producer,
+			"crossings.events",
+			cfg.Outbox.BatchSize,
+			cfg.Outbox.Interval,
+		)
+
+		go w.Start(ctx)
+	}
 
 	r := router.NewRouter(pool)
 

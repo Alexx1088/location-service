@@ -7,5 +7,6 @@ kafka:
     - "localhost:9094"
 
 outbox:
-  batch_size: 500
+  batch_size: 1000
   interval: 1s
+  workers_count: 3

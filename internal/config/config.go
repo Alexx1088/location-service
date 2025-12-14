@@ -22,8 +22,9 @@ type KafkaConfig struct {
 }
 
 type OutboxConfig struct {
-	BatchSize int           `yaml:"batch_size"`
-	Interval  time.Duration `yaml:"interval"`
+	BatchSize    int           `yaml:"batch_size"`
+	Interval     time.Duration `yaml:"interval"`
+	WorkersCount int           `yaml:"workers_count"`
 }
 
 func Load(path string) (*Config, error) {
