@@ -38,10 +38,11 @@ func main() {
 
 	fmt.Printf("Using Kafka brokers: %v\n", cfg.Kafka.Brokers)
 
-	producer, err := kafka.NewKafkaProducer(cfg.Kafka.Brokers)
+	producer, err := kafka.NewKafkaAsyncProducer(cfg.Kafka.Brokers)
 	if err != nil {
-		log.Fatalf("Failed to create Kafka producer: %v", err)
+		log.Fatalf("Failed to create Kafka async producer: %v", err)
 	}
+	defer producer.AsyncClose()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
