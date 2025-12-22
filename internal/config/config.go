@@ -3,6 +3,7 @@ package config
 import (
 	"gopkg.in/yaml.v3"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -28,14 +29,30 @@ type OutboxConfig struct {
 }
 
 func Load(path string) (*Config, error) {
-	raw, err := os.ReadFile(path)
+	cfg := &Config{}
+
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	var cfg Config
-	if err := yaml.Unmarshal(raw, &cfg); err != nil {
+	if err := yaml.Unmarshal(data, cfg); err != nil {
 		return nil, err
 	}
-	return &cfg, nil
+
+	env := os.Getenv("APP_ENV")
+	var brokers string
+
+	switch env {
+	case "k8s":
+		brokers = os.Getenv("KAFKA_BROKERS_K8S")
+	case "minikube":
+		brokers = os.Getenv("KAFKA_BROKERS_MINIKUBE")
+	}
+
+	if brokers != "" {
+		cfg.Kafka.Brokers = strings.Split(brokers, ",")
+	}
+
+	return cfg, nil
 }

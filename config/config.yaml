@@ -4,9 +4,8 @@ server:
 
 kafka:
   brokers:
-    - "localhost:9094"
-
+     - "localhost:9094"
 outbox:
   batch_size: 1000
-  interval: 1s
+  interval: 0.5s
   workers_count: 3
