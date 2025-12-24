@@ -12,7 +12,7 @@ import (
 func Connect() *pgxpool.Pool {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
-		dsn = "postgres://user:password@localhost:5432/location?sslmode=disable"
+		log.Fatal("DATABASE_URL не задан в окружении")
 	}
 
 	pool, err := pgxpool.New(context.Background(), dsn)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"location-service/internal/model"
+	"log"
 	"os"
 	"strings"
 	"testing"
@@ -14,7 +15,7 @@ func setupTestDB(t *testing.T) *pgxpool.Pool {
 
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
-		dsn = "postgres://user:password@localhost:5432/location_test?sslmode=disable"
+		log.Fatal("DATABASE_URL не задан в окружении")
 	}
 	t.Logf("connecting to %s", dsn)
 

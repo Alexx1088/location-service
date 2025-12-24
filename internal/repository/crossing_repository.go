@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"location-service/internal/dto/crossing"
 	"location-service/internal/model"
@@ -15,6 +16,8 @@ import (
 type CrossingRepositoryInterface interface {
 	Create(ctx context.Context, crossing *model.Crossing) error
 	GetAll(ctx context.Context, dto crossing.FilterDTO) ([]crossing.WithAddressDTO, error)
+	CreateTx(ctx context.Context, tx pgx.Tx, crossing *model.Crossing) error
+	BeginTx(ctx context.Context) (pgx.Tx, error)
 }
 
 type CrossingRepository struct {
@@ -25,6 +28,14 @@ func NewCrossingRepository(db *pgxpool.Pool) *CrossingRepository {
 	return &CrossingRepository{db: db}
 }
 
+func (r *CrossingRepository) CreateTx(ctx context.Context, tx pgx.Tx, crossing *model.Crossing) error {
+	query := `INSERT INTO crossings (crossroad_id, event_time) VALUES ($1, $2) RETURNING id`
+	return tx.QueryRow(ctx, query, crossing.CrossroadID, crossing.EventTime).Scan(&crossing.ID)
+}
+
+func (r *CrossingRepository) BeginTx(ctx context.Context) (pgx.Tx, error) {
+	return r.db.Begin(ctx)
+}
 func (r *CrossingRepository) Create(ctx context.Context, crossing *model.Crossing) error {
 	query := `INSERT INTO crossings (crossroad_id, event_time) VALUES ($1, $2) RETURNING id`
 
