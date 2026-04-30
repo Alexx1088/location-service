@@ -20,11 +20,11 @@ spec:
             - containerPort: 8080
           env:
             - name: KAFKA_CLUSTERS_0_NAME
-              value: "my-minikube-cluster"
+              value: aws-kafka-dev
             - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
-              value: "my-cluster-kafka-bootstrap.kafka.svc:9092"
+              value: my-cluster-kafka-bootstrap.kafka:9092
             - name: KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL
-              value: "PLAINTEXT"
+              value: PLAINTEXT
 ---
 apiVersion: v1
 kind: Service
@@ -32,10 +32,10 @@ metadata:
   name: kafka-ui
   namespace: kafka
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: kafka-ui
   ports:
-    - protocol: TCP
-      port: 8080
+    - port: 8080
       targetPort: 8080
+      nodePort: 30080

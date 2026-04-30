@@ -4,7 +4,7 @@ server:
 
 kafka:
   brokers:
-     - "localhost:9094"
+     - "51.21.102.163:32421"
 outbox:
   batch_size: 1000
   interval: 0.5s
